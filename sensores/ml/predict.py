@@ -1,17 +1,12 @@
 import joblib
 import numpy as np
-from tensorflow.keras.models import load_model
-from sklearn.preprocessing import StandardScaler
+import os
 
-# Cargar modelos
-svm_model = joblib.load('svm_model.pkl')
-bp_model = load_model('bp_model.h5')
-scaler = joblib.load('scaler.pkl')
+modelo_path = os.path.join(os.path.dirname(__file__), 'modelo_entrenado.pkl')
+modelo = joblib.load(modelo_path)
 
-def predict_diabetes(acetona):
-    x = np.array([[acetona]])  # puedes agregar más features si tienes
-    x_scaled = scaler.transform(x)
-    svm_pred = svm_model.predict(x_scaled)
-    combined_input = np.column_stack((x_scaled, svm_pred))
-    y_pred = bp_model.predict(combined_input)[0][0]
-    return 'Diabetes' if y_pred > 0.5 else 'No Diabetes'
+# Recibe lista de características [Edad, Sexo (0/1), Peso, Altura, Antecedentes (0/1), Acetona]
+def predecir_diabetes(entrada_lista):
+    entrada = np.array([entrada_lista])
+    pred = modelo.predict(entrada)[0]
+    return "Diabético" if pred == 1 else "No diabético"

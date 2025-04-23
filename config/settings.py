@@ -41,6 +41,7 @@ INSTALLED_APPS = [
     'esp32_code',
     'frontend',
     'sensores',
+    'rest_framework',
 ]
 
 MIDDLEWARE = [

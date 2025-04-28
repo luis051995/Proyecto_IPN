@@ -1,0 +1,7 @@
+# Entorno virtual de python
+proy_IPN/
+venv/
+.env/
+ENV/
+*.pyc
+__pycache__/

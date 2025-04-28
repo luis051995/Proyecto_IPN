@@ -39,7 +39,7 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'dataset',
     'esp32_code',
-    'frontend',
+    #'frontend',
     'sensores',
     'rest_framework',
 ]

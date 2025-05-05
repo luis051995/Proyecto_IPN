@@ -20,4 +20,5 @@ from django.urls import path, include  # <-- incluye include
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('api/', include('sensores.urls')),  # <-- cambia 'sensor' por el nombre real de tu app
+    path('', include('frontend.urls')),
 ]

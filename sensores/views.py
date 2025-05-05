@@ -13,10 +13,11 @@ class RegisterUserView(APIView):
     def post(self, request):
         nombre = request.data.get('usuario')
         contrasena = request.data.get('contrasena')
+        edad = request.data.get('edad')
 
-        if not nombre or not contrasena:
+        if not nombre or not contrasena or not edad:
             return Response(
-                {"error": "Los campos 'usuario' y 'contrasena' son obligatorios"},
+                {"error": "Los campos 'usuario',  'contrasena' y edad son obligatorios"},
                 status=status.HTTP_400_BAD_REQUEST
             )
 

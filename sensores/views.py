@@ -2,6 +2,8 @@ from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework import status
 from django.shortcuts import get_object_or_404
+from django.conf import settings
+import os, csv
 
 from .models import Usuario, Historial
 from .ml.predict import predecir_diabetes
@@ -11,25 +13,60 @@ class RegisterUserView(APIView):
     Registra un nuevo usuario con 'usuario' y 'contrasena'.
     """
     def post(self, request):
-        nombre = request.data.get('usuario')
-        contrasena = request.data.get('contrasena')
-        edad = request.data.get('edad')
+        csv_path = os.path.join(settings.BASE_DIR, 'dataset/diabetes_database.csv')
 
-        if not nombre or not contrasena or not edad:
+        data = {
+            'nombre': request.data.get('usuario'),
+            'contrasena': request.data.get('contrasena'),
+            'edad': request.data.get('edad', 18),  # Valor por defecto 18
+            'sexo': request.data.get('sexo', ''),  # Campo opcional
+            'peso': request.data.get('peso', 0.0),  # Valor por defecto 0.0
+            'altura': request.data.get('altura', 0.0),  # Valor por defecto 0.0
+            'antecedentes': request.data.get('antecedentes', '')  # Campo opcional
+        }
+
+        # Añadir al archivo CSV
+        with open(csv_path, mode='a', newline='', encoding='utf-8-sig') as csvfile:
+            writer = csv.writer(csvfile)
+            
+            # Escribir nueva fila 
+            writer.writerow([
+                data['edad'],
+                data['sexo'],
+                data['peso'],
+                data['altura'],
+                data['antecedentes'],
+                0.0,  # Valor inicial para acetona
+                0     # Valor inicial para salida (0 = No diabético)
+            ])
+
+        if not data['nombre'] or not data['contrasena']:
             return Response(
-                {"error": "Los campos 'usuario',  'contrasena' y edad son obligatorios"},
+                {"error": "Los campos 'usuario' y 'contrasena' son obligatorios"},
                 status=status.HTTP_400_BAD_REQUEST
             )
 
-        if Usuario.objects.filter(nombre=nombre).exists():
+
+        if Usuario.objects.filter(nombre=data['nombre']).exists():
             return Response(
                 {"error": "El usuario ya existe"},
                 status=status.HTTP_400_BAD_REQUEST
             )
 
-        u = Usuario.objects.create(nombre=nombre, contrasena=contrasena)
+        usuario = Usuario.objects.create(**data)
+        
         return Response(
-            {"mensaje": "Usuario registrado con éxito", "usuario_id": u.id},
+            {
+                "mensaje": "Usuario registrado con éxito",
+                "usuario_id": usuario.id,
+                "datos": {
+                    "nombre": usuario.nombre,
+                    "edad": usuario.edad,
+                    "sexo": usuario.sexo,
+                    "peso": usuario.peso,
+                    "altura": usuario.altura
+                }
+            },
             status=status.HTTP_201_CREATED
         )
 

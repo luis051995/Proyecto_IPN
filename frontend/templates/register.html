@@ -3,11 +3,11 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Registro de Usuario</title>
+    <title>Registro Completo de Usuario</title>
     <style>
         body {
             font-family: Arial, sans-serif;
-            max-width: 400px;
+            max-width: 600px;
             margin: 0 auto;
             padding: 20px;
         }
@@ -19,7 +19,7 @@
             margin-bottom: 5px;
             font-weight: bold;
         }
-        input {
+        input, select, textarea {
             width: 100%;
             padding: 8px;
             box-sizing: border-box;
@@ -34,6 +34,7 @@
             border-radius: 4px;
             cursor: pointer;
             width: 100%;
+            font-size: 16px;
         }
         button:hover {
             background-color: #45a049;
@@ -57,64 +58,97 @@
     </style>
 </head>
 <body>
-    <h2>Registro de Usuario</h2>
+    <h2>Registro Completo de Usuario</h2>
     <form id="registerForm">
+        <!-- Campos obligatorios -->
         <div class="form-group">
-            <label for="usuario">Usuario:</label>
+            <label for="usuario">Usuario*:</label>
             <input type="text" id="usuario" required>
         </div>
         <div class="form-group">
-            <label for="contrasena">Contraseña:</label>
+            <label for="contrasena">Contraseña*:</label>
             <input type="password" id="contrasena" required>
         </div>
+        
+        <!-- Campos opcionales con valores por defecto -->
         <div class="form-group">
             <label for="edad">Edad:</label>
-            <input type="number" id="edad" required>
+            <input type="number" id="edad" min="1" max="120" value="18">
         </div>
+        
+        <div class="form-group">
+            <label for="sexo">Sexo:</label>
+            <select id="sexo">
+                <option value="">Seleccione...</option>
+                <option value="Masculino">Masculino</option>
+                <option value="Femenino">Femenino</option>
+                <option value="Otro">Otro</option>
+            </select>
+        </div>
+        
+        <div class="form-group">
+            <label for="peso">Peso (kg):</label>
+            <input type="number" id="peso" step="0.1" min="0" value="0.0">
+        </div>
+        
+        <div class="form-group">
+            <label for="altura">Altura (m):</label>
+            <input type="number" id="altura" step="0.01" min="0" value="0.0">
+        </div>
+        
+        <div class="form-group">
+            <label for="antecedentes">Antecedentes médicos:</label>
+            <textarea id="antecedentes" rows="4"></textarea>
+        </div>
+        
         <button type="submit">Registrarse</button>
     </form>
+    
     <div id="message" class="message"></div>
 
     <script>
         document.getElementById('registerForm').addEventListener('submit', async function(e) {
             e.preventDefault();
             
-            const usuario = document.getElementById('usuario').value;
-            const contrasena = document.getElementById('contrasena').value;
-            const messageDiv = document.getElementById('message');
+            // Obtener todos los valores del formulario
+            const formData = {
+                usuario: document.getElementById('usuario').value,
+                contrasena: document.getElementById('contrasena').value,
+                edad: document.getElementById('edad').value,
+                sexo: document.getElementById('sexo').value,
+                peso: document.getElementById('peso').value,
+                altura: document.getElementById('altura').value,
+                antecedentes: document.getElementById('antecedentes').value
+            };
             
-            // Reset message
+            const messageDiv = document.getElementById('message');
             messageDiv.style.display = 'none';
-            messageDiv.className = 'message';
             
             try {
-                const response = await fetch('/api/register/', {  // Asume que está en la misma URL base
+                const response = await fetch('/api/register/', {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json',
-                        'X-CSRFToken': getCookie('csrftoken'),  // Necesario para CSRF
+                        'X-CSRFToken': getCookie('csrftoken'),
                     },
-                    body: JSON.stringify({
-                        usuario: usuario,
-                        contrasena: contrasena
-                    })
+                    body: JSON.stringify(formData)
                 });
                 
                 const data = await response.json();
                 
                 if (response.ok) {
-                    messageDiv.textContent = data.mensaje + ' ID de usuario: ' + data.usuario_id;
-                    messageDiv.classList.add('success');
-                    // Limpiar formulario después de registro exitoso
-                    document.getElementById('registerForm').reset();
+                    messageDiv.textContent = data.mensaje;
+                    messageDiv.className = 'message success';
+                    // Opcional: redirigir después de registro exitoso
+                    // window.location.href = '/dashboard/';
                 } else {
-                    messageDiv.textContent = data.error;
-                    messageDiv.classList.add('error');
+                    messageDiv.textContent = data.error || 'Error en el registro';
+                    messageDiv.className = 'message error';
                 }
                 messageDiv.style.display = 'block';
             } catch (error) {
-                messageDiv.textContent = 'Error al conectar con el servidor';
-                messageDiv.classList.add('error');
+                messageDiv.textContent = 'Error de conexión con el servidor';
+                messageDiv.className = 'message error';
                 messageDiv.style.display = 'block';
                 console.error('Error:', error);
             }

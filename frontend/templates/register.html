@@ -141,6 +141,9 @@
                     messageDiv.className = 'message success';
                     // Opcional: redirigir después de registro exitoso
                     // window.location.href = '/dashboard/';
+                    if (data.redirect_url) {
+                        window.location.href = data.redirect_url;  // Redirigir al historial
+                    }
                 } else {
                     messageDiv.textContent = data.error || 'Error en el registro';
                     messageDiv.className = 'message error';

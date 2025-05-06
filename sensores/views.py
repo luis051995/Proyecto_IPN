@@ -1,6 +1,7 @@
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework import status
+from django.shortcuts import render
 from django.shortcuts import get_object_or_404
 from django.conf import settings
 import os, csv
@@ -58,6 +59,7 @@ class RegisterUserView(APIView):
         return Response(
             {
                 "mensaje": "Usuario registrado con éxito",
+                "redirect_url": f"/historial/{usuario.id}/",  # Nueva línea
                 "usuario_id": usuario.id,
                 "datos": {
                     "nombre": usuario.nombre,

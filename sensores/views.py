@@ -2,9 +2,11 @@ from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework import status
 from django.shortcuts import get_object_or_404
-
 from .models import Usuario, Historial
 from .ml.predict import predecir_diabetes
+from django.http import JsonResponse
+from rest_framework_simplejwt.tokens import RefreshToken
+from django.contrib.auth import authenticate
 
 class RegisterUserView(APIView):
     """
@@ -102,3 +104,29 @@ class HistorialUsuarioView(APIView):
             for r in registros
         ]
         return Response(data, status=status.HTTP_200_OK)
+
+def get_historial(request, usuario_id):
+    try:
+        usuario = Usuario.objects.get(id=usuario_id)
+        historial = Historial.objects.filter(usuario=usuario).order_by('-fecha')
+        data = {
+            'nombre': usuario.nombre,
+            'historial': [
+                {'fecha': h.fecha, 'acetona': h.acetona, 'resultado': h.resultado}
+                for h in historial
+            ]
+        }
+        return JsonResponse(data, safe=False)
+    except Usuario.DoesNotExist:
+        return JsonResponse({'error': 'Usuario no encontrado'}, status=404)
+
+class LoginView(APIView):
+    def post(self, request):
+        username = request.data.get('username')
+        password = request.data.get('password')
+        user = authenticate(username=username, password=password)
+        
+        if user is not None and user.is_medico:
+            refresh = RefreshToken.for_user(user)
+            return Response({'token': str(refresh.access_token)})
+        return Response({'error': 'Usuario o contraseña incorrectos'}, status=400)

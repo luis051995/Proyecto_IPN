@@ -1,17 +1,21 @@
-diabetes_detector/
+IPN/
 ├── config/                     # Proyecto Django
 │   └── settings.py, urls.py, ...
 ├── sensores/                   # App principal
+│   ├── admin.py               # Modelos Usuario, Historial
 │   ├── models.py               # Modelos Usuario, Historial
 │   ├── views.py                # Recibe datos y predice
 │   ├── urls.py                 # Rutas
 │   └── ml/                     # Algoritmos ML
 │       ├── modelo_entrenado.pkl
 │       └── predict.py
+│       └── train_model.py
+|       
 ├── frontend/                   # Interfaz del doctor (React opcional o HTML simple)
 ├── dataset/
 │   └── entrenamiento.csv       # Tu archivo de entrenamiento
 ├── manage.py
 ├── db.sqlite3
 └── esp32_code/
+│   └── output/    
     └── send_data.ino           # Código Arduino para ESP32

@@ -11,7 +11,22 @@ IPN/
 │       └── predict.py
 │       └── train_model.py
 |       
-├── frontend/                   # Interfaz del doctor (React opcional o HTML simple)
+├── frontend/frontend                
+│   ├── node_modules/              
+│   ├── public/                
+│   ├── src/                 
+│       ├── components/
+|            |____ Dashboard.js
+|            |____ Grafico.js     
+|            |____ Login.js.   
+│       └── App.css
+│       └── App.js
+│       └── App.test
+│       └── index.css
+│       ├── index.js
+│       └── postcss.config.js
+│       └── tailwind.config.js
+|       
 ├── dataset/
 │   └── entrenamiento.csv       # Tu archivo de entrenamiento
 ├── manage.py

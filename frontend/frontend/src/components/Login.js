@@ -1,53 +1,48 @@
+// Login.js
 import React, { useState } from 'react';
-import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
+import axios from 'axios';
 
-const Login = () => {
+const Login = ({ onLogin }) => {
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
-  const [error, setError] = useState(null);
-  const navigate = useNavigate();  // useNavigate instead of useHistory
+  const navigate = useNavigate();
 
-  const handleSubmit = (event) => {
-    event.preventDefault();
-    axios
-      .post('http://127.0.0.1:8000/api/login/', { username, password })
-      .then((response) => {
-        // Guarda el token o la información del usuario
-        localStorage.setItem('token', response.data.token);
-        navigate('/dashboard');  // use navigate for routing
-      })
-      .catch((error) => {
-        setError('Usuario o contraseña incorrectos');
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    try {
+      const response = await axios.post('http://127.0.0.1:8000/api/token/', {
+        username,
+        password,
       });
+
+      localStorage.setItem('access', response.data.access);
+      localStorage.setItem('refresh', response.data.refresh);
+
+      onLogin(true);
+      navigate('/dashboard');  // ✅ redirige aquí
+    } catch (error) {
+      alert('Usuario o contraseña incorrectos');
+    }
   };
 
   return (
-    <div>
-      <h1>Iniciar sesión</h1>
-      <form onSubmit={handleSubmit}>
-        <div>
-          <label>Usuario</label>
-          <input
-            type="text"
-            value={username}
-            onChange={(e) => setUsername(e.target.value)}
-            required
-          />
-        </div>
-        <div>
-          <label>Contraseña</label>
-          <input
-            type="password"
-            value={password}
-            onChange={(e) => setPassword(e.target.value)}
-            required
-          />
-        </div>
-        <button type="submit">Iniciar sesión</button>
-      </form>
-      {error && <p>{error}</p>}
-    </div>
+    <form onSubmit={handleSubmit}>
+      <h2>Iniciar sesión</h2>
+      <input
+        type="text"
+        placeholder="Usuario"
+        value={username}
+        onChange={(e) => setUsername(e.target.value)}
+      /><br />
+      <input
+        type="password"
+        placeholder="Contraseña"
+        value={password}
+        onChange={(e) => setPassword(e.target.value)}
+      /><br />
+      <button type="submit">Entrar</button>
+    </form>
   );
 };
 

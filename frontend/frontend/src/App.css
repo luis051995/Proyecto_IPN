@@ -36,3 +36,37 @@
     transform: rotate(360deg);
   }
 }
+
+/* Estilos para la página de dashboard */
+body {
+  background-color: #f4f6f9; /* Color de fondo suave */
+  color: #333; /* Texto oscuro */
+}
+
+.dashboard {
+  padding: 20px;
+  background-color: #fff;
+  border-radius: 8px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+.card {
+  background-color: #f9f9f9;
+  border: 1px solid #ddd;
+  padding: 15px;
+  margin: 15px;
+  border-radius: 10px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.button-download {
+  background-color: #007bff;
+  color: white;
+  padding: 10px 20px;
+  border-radius: 5px;
+  text-decoration: none;
+}
+
+.button-download:hover {
+  background-color: #0056b3;
+}

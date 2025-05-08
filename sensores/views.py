@@ -7,6 +7,9 @@ from .ml.predict import predecir_diabetes
 from django.http import JsonResponse
 from rest_framework_simplejwt.tokens import RefreshToken
 from django.contrib.auth import authenticate
+from rest_framework import serializers, views, status
+from django.contrib.auth.models import User
+from .models import Medico
 
 class RegisterUserView(APIView):
     """
@@ -130,3 +133,22 @@ class LoginView(APIView):
             refresh = RefreshToken.for_user(user)
             return Response({'token': str(refresh.access_token)})
         return Response({'error': 'Usuario o contraseña incorrectos'}, status=400)
+
+# Serializador para crear nuevo médico
+class MedicoSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Medico
+        fields = ['username', 'password', 'especialidad']  # Asegúrate de incluir los campos correctos
+
+    def create(self, validated_data):
+        user = Medico.objects.create_user(**validated_data)  # Usa create_user para manejar contraseñas
+        return user
+
+# Vista para crear nuevo médico
+class RegistroMedicoView(views.APIView):
+    def post(self, request):
+        serializer = MedicoSerializer(data=request.data)
+        if serializer.is_valid():
+            serializer.save()
+            return Response({"message": "Médico registrado exitosamente"}, status=status.HTTP_201_CREATED)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)

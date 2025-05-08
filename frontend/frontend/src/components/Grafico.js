@@ -1,47 +1,44 @@
+// Grafico.js
 import React, { useEffect, useState } from 'react';
-import { Line } from 'react-chartjs-2';
 import axios from 'axios';
-import { Chart as ChartJS, CategoryScale, LinearScale, LineElement, PointElement, Title, Tooltip, Legend } from 'chart.js';
-
-ChartJS.register(CategoryScale, LinearScale, LineElement, PointElement, Title, Tooltip, Legend);
+import ChartComponent from './ChartComponent';
 
 const Grafico = ({ usuarioId }) => {
-  const [data, setData] = useState(null);
+  const [data, setData] = useState([]);
 
   useEffect(() => {
-    axios
-      .get(`http://127.0.0.1:8000/api/historial/${usuarioId}/`)
-      .then((response) => {
-        const { historial } = response.data;
-        const fechas = historial.map((h) => h.fecha);
-        const acetona = historial.map((h) => h.acetona);
-
-        setData({
-          labels: fechas,
-          datasets: [
-            {
-              label: 'Nivel de Acetona',
-              data: acetona,
-              fill: false,
-              borderColor: 'rgb(75, 192, 192)',
-              tension: 0.1,
-            },
-          ],
+    const fetchHistorial = async () => {
+      try {
+        const token = localStorage.getItem('access');
+        const response = await axios.get(`http://127.0.0.1:8000/api/historial/${usuarioId}/`, {
+          headers: {
+            Authorization: `Bearer ${token}`
+          }
         });
-      })
-      .catch((error) => {
-        console.error('Hubo un error al obtener los datos del historial:', error);
-      });
-  }, [usuarioId]);
 
-  if (!data) {
-    return <div>Cargando...</div>;
-  }
+        if (response.data.historial) {
+          const formattedData = response.data.historial.map(entry => ({
+            fecha: entry.fecha,
+            acetona: entry.acetona
+          }));
+          setData(formattedData);
+        } else {
+          console.warn("No se recibió historial");
+          setData([]); // Vacío pero no null
+        }
+      } catch (error) {
+        console.error("Error al obtener historial:", error);
+        setData([]); // Para prevenir el error "data is null"
+      }
+    };
+
+    fetchHistorial();
+  }, [usuarioId]);
 
   return (
     <div>
-      <h2>Historial de Acetona</h2>
-      <Line data={data} />
+      <h3>Historial de Acetona</h3>
+      <ChartComponent data={data} />
     </div>
   );
 };

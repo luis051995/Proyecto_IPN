@@ -6,6 +6,56 @@ import plotly.express as px
 from plotly.offline import plot
 import pandas as pd
 from django.utils.timezone import localtime
+from django.shortcuts import render
+from django.views.decorators.csrf import csrf_exempt
+from django.http import JsonResponse
+from django.contrib.auth import authenticate, login
+
+@csrf_exempt
+def login_view(request):
+    if request.method == 'POST':
+        try:
+            # Manejar tanto JSON como FormData
+            if request.content_type == 'application/json':
+                data = json.loads(request.body)
+            else:
+                data = request.POST
+            
+            username = data.get('username') or data.get('nombre')  # Prueba ambos nombres
+            password = data.get('password') or data.get('contrasena')
+            
+            if not username or not password:
+                return JsonResponse(
+                    {'error': 'Usuario y contraseña son requeridos'}, 
+                    status=400
+                )
+            
+            user = authenticate(request, username=username, password=password)
+            
+            if user is not None:
+                login(request, user)
+                return JsonResponse({
+                    'success': True,
+                    'redirect': '/dashboard/'
+                })
+            else:
+                return JsonResponse(
+                    {'error': 'Credenciales inválidas'}, 
+                    status=400
+                )
+                
+        except Exception as e:
+            return JsonResponse(
+                {'error': f'Error en el servidor: {str(e)}'}, 
+                status=500
+            )
+    
+    return JsonResponse(
+        {'error': 'Método no permitido'}, 
+        status=405
+    )
+    
+    return render(request, 'login.html')
 
 def registro(request):
   template = loader.get_template('register.html')

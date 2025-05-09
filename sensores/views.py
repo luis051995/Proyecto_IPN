@@ -18,7 +18,7 @@ class RegisterUserView(APIView):
 
         data = {
             'nombre': request.data.get('usuario'),
-            'contrasena': request.data.get('contrasena'),
+            'password': request.data.get('contrasena'),
             'edad': request.data.get('edad', 18),  # Valor por defecto 18
             'sexo': request.data.get('sexo', ''),  # Campo opcional
             'peso': request.data.get('peso', 0.0),  # Valor por defecto 0.0
@@ -41,9 +41,9 @@ class RegisterUserView(APIView):
                 0     # Valor inicial para salida (0 = No diabético)
             ])
 
-        if not data['nombre'] or not data['contrasena']:
+        if not data['nombre'] or not data['password']:
             return Response(
-                {"error": "Los campos 'usuario' y 'contrasena' son obligatorios"},
+                {"error": "Los campos 'usuario' y 'password' son obligatorios"},
                 status=status.HTTP_400_BAD_REQUEST
             )
 
@@ -142,3 +142,5 @@ class HistorialUsuarioView(APIView):
             for r in registros
         ]
         return Response(data, status=status.HTTP_200_OK)
+    
+
